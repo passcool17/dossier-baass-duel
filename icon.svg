@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Dossier BAASS Duel">
+  <rect width="512" height="512" fill="#1a1712"/>
+  <rect x="36" y="36" width="440" height="440" fill="#efe6d4" stroke="#2a241c" stroke-width="12"/>
+  <rect x="36" y="36" width="440" height="72" fill="#8a5a14"/>
+  <text x="256" y="86" text-anchor="middle" font-family="Georgia, serif" font-size="42" fill="#efe6d4" font-weight="700">BAASS</text>
+  <!-- tug of war rope -->
+  <line x1="80" y1="280" x2="432" y2="280" stroke="#3a3328" stroke-width="10" stroke-dasharray="14 8"/>
+  <!-- amber folder (enquête) -->
+  <rect x="300" y="210" width="150" height="140" rx="8" fill="#c4852a"/>
+  <rect x="300" y="200" width="70" height="28" rx="6" fill="#d9a44a"/>
+  <text x="375" y="295" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1a1712">Enquête</text>
+  <!-- black redaction (DIA) -->
+  <rect x="62" y="220" width="150" height="120" rx="4" fill="#111"/>
+  <rect x="78" y="248" width="118" height="22" fill="#efe6d4" opacity="0.15"/>
+  <rect x="78" y="284" width="90" height="22" fill="#efe6d4" opacity="0.15"/>
+  <text x="137" y="360" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#8b1e1e">SECRET</text>
+  <!-- token in the middle -->
+  <circle cx="256" cy="280" r="28" fill="#efe6d4" stroke="#8a5a14" stroke-width="6"/>
+</svg>
