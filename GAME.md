@@ -47,8 +47,8 @@ Les effets (tirages, liens, secret) sont des mécaniques de fiction.
 Facile, Normal, Difficile : **mêmes règles**, IA de plus en plus précise. Taux visés pour un joueur heuristique : environ 65 / 45 / 25 %. Résultats obtenus (200 parties, graine 2026) :
 
 - Facile : **61 %**
-- Normal : **42 %**
-- Difficile : **28,5 %**
+- Normal : **41,5 %**
+- Difficile : **27,5 %**
 
 L’ordre facile > normal > difficile est respecté. Le facile est un peu sous 65 % ; le difficile un peu au-dessus de 25 %.
 

@@ -1,6 +1,6 @@
 /** Données du jeu. Les citations sont des extraits mot pour mot du document. */
 
-export const VERSION = 'baass-duel-v1';
+export const VERSION = 'baass-duel-v2';
 export const SAVE_KEY = 'baass.duel.v1';
 export const SETTINGS_KEY = 'baass.duel.settings.v1';
 

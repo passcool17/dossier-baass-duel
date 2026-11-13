@@ -273,14 +273,14 @@ button.icon-btn {
   grid-template-columns: 6.1rem 1fr;
   gap: 0.3rem;
   align-items: center;
-  margin-bottom: 0.18rem;
-  padding: 0.1rem 0.15rem;
+  margin-bottom: 0.1rem;
+  padding: 0.15rem 0.15rem;
   border-radius: 0.3rem;
   border: 2px solid transparent;
   background: transparent;
   color: inherit;
   width: 100%;
-  min-height: 2.35rem;
+  min-height: 44px;
   text-align: left;
   overflow: hidden;
 }

@@ -1,4 +1,4 @@
-const VERSION = 'baass-duel-v1';
+const VERSION = 'baass-duel-v2';
 const ASSETS = [
   './',
   './index.html',

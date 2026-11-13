@@ -463,7 +463,7 @@ export function applyMove(prev, move) {
     state.bid[side] = move.cardId;
     state.hands[side] = state.hands[side].filter((id) => id !== move.cardId);
     const c = cardById(move.cardId);
-    log(state, `${side === 'player' ? 'Tu enchéris' : 'Secret DIA enchérít'} avec « ${c.title} » (valeur ${c.value}).`);
+    log(state, `${side === 'player' ? 'Tu enchéris' : 'Secret DIA enchérit'} avec « ${c.title} » (valeur ${c.value}).`);
     state.lastMove = move;
     if (state.bid.player && state.bid.dia) resolveBids(state);
     else state.currentActor = state.bid.player ? 'dia' : 'player';
@@ -638,12 +638,41 @@ export function deserialize(json) {
   return state;
 }
 
-/** Force une fin (paramètre de debug). */
+/** Force une fin (paramètre de debug) avec des compteurs plausibles. */
 export function debugForceEnd(prev, winner, reason) {
   const state = cloneState(prev);
+  const why = reason || (winner === 'player' ? 'liens' : 'secrecy');
   state.winner = winner;
-  state.endReason = reason || (winner === 'player' ? 'liens' : 'secrecy');
+  state.endReason = why;
   state.phase = 'gameover';
+  if (state.round < 4) state.round = 5;
+  if (winner === 'player') {
+    const persons = INFORMANTS.map((p) => p.id);
+    const tids = TRACKS.map((t) => t.id);
+    state.liens = [];
+    for (let i = 0; i < LIENS_TO_WIN; i++) {
+      const person = persons[i];
+      const track = tids[i];
+      state.tracks[track] = { pos: TRACK_MAX, locked: 'player' };
+      state.informants[person] = { placed: true, linkedTrack: track };
+      state.liens.push({ person, track });
+    }
+    if (state.secrecy < 1) state.secrecy = 2;
+  } else if (why === 'redact') {
+    const tids = TRACKS.map((t) => t.id);
+    for (let i = 0; i < REDACT_TO_WIN; i++) {
+      state.tracks[tids[i]] = { pos: TRACK_MIN, locked: 'dia' };
+    }
+  } else {
+    state.secrecy = SECRECY_TO_WIN;
+    if (state.liens.length === 0) {
+      const person = INFORMANTS[0].id;
+      const track = TRACKS[0].id;
+      state.tracks[track] = { pos: TRACK_MAX, locked: 'player' };
+      state.informants[person] = { placed: true, linkedTrack: track };
+      state.liens = [{ person, track }];
+    }
+  }
   log(state, winner === 'player' ? 'Divulgation (debug).' : 'Dossier enterré (debug).');
   return state;
 }

@@ -136,35 +136,65 @@ function pickByDifficulty(scored, difficulty, rng, maximize) {
   return scored[0].move;
 }
 
+/**
+ * Vue d’enchère simultanée : la mise adverse n’est pas visible, et sa carte
+ * est remise en main (état de début de phase). Infos publiques conservées :
+ * pistes, liens, secret, défausses, taille des mains.
+ */
+export function simultaneousBidView(state, side) {
+  const s = cloneState(state);
+  const other = side === 'dia' ? 'player' : 'dia';
+  if (s.bid && s.bid[other]) {
+    const id = s.bid[other];
+    if (!s.hands[other].includes(id)) s.hands[other] = [...s.hands[other], id];
+  }
+  s.bid = { player: null, dia: null };
+  return s;
+}
+
+function publicThreat(state, side) {
+  if (side === 'dia') {
+    return (
+      TRACKS.some((t) => state.tracks[t.id].pos >= 2 && !state.tracks[t.id].locked) ||
+      state.liens.length >= LIENS_TO_WIN - 1 ||
+      lockedCount(state, 'player') >= 2
+    );
+  }
+  return (
+    TRACKS.some((t) => state.tracks[t.id].pos <= -2 && !state.tracks[t.id].locked) ||
+    state.secrecy >= SECRECY_TO_WIN - 1 ||
+    lockedCount(state, 'dia') >= REDACT_TO_WIN - 1
+  );
+}
+
 function chooseBid(state, side, difficulty, rng) {
-  const moves = legalMoves(state, side).filter((m) => m.type === 'bid');
+  // Jamais la mise adverse : on travaille uniquement sur la vue simultanée.
+  const view = simultaneousBidView(state, side);
+  const moves = legalMoves(view, side).filter((m) => m.type === 'bid');
   if (moves.length === 0) return null;
   const cards = moves.map((m) => ({ move: m, card: cardById(m.cardId) }));
   cards.sort((a, b) => a.card.value - b.card.value);
 
-  const threat =
-    side === 'dia'
-      ? TRACKS.some((t) => state.tracks[t.id].pos >= 2 && !state.tracks[t.id].locked) ||
-        state.liens.length >= LIENS_TO_WIN - 1
-      : TRACKS.some((t) => state.tracks[t.id].pos <= -2 && !state.tracks[t.id].locked) ||
-        state.secrecy >= SECRECY_TO_WIN - 1 ||
-        lockedCount(state, 'dia') >= REDACT_TO_WIN - 1;
+  const threat = publicThreat(view, side);
+  // Infos publiques seulement (défausse, secret, pistes). Jamais state.bid adverse.
 
   if (side === 'dia' && difficulty === 'facile') {
     return cards[0].move; // toujours une petite mise
   }
   if (side === 'dia' && difficulty === 'difficile') {
-    // L’IA difficile anticipe : si la mise adverse est déjà posée, elle tente de juste la battre.
-    const oppId = state.bid && state.bid.player;
-    const opp = oppId ? cardById(oppId) : null;
-    if (opp) {
-      const beating = cards.filter((c) => c.card.value > opp.value).sort((a, b) => a.card.value - b.card.value);
-      if (beating.length) return beating[0].move;
-      return cards[0].move; // ne peut pas battre : jette une petite
-    }
-    if (threat) return cards[cards.length - 1].move;
-    const mid = cards.find((c) => c.card.value === 3) || cards[Math.floor(cards.length / 2)];
-    return mid.move;
+    // Mise agressive sur info publique seulement (jamais la carte adverse) :
+    // on réserve une petite carte, on mise souvent haut pour l’initiative.
+    const pubPress =
+      threat ||
+      view.round <= 3 ||
+      view.secrecy >= SECRECY_TO_WIN - 2 ||
+      lockedCount(view, 'player') >= 1 ||
+      TRACKS.some((t) => view.tracks[t.id].pos >= 1 && !view.tracks[t.id].locked) ||
+      (view.discards && view.discards.player && view.discards.player.length >= 6);
+    if (pubPress) return cards[cards.length - 1].move;
+    // Sinon l’avant-dernière (garde un 4-5 pour plus tard si ce n’est pas urgent)
+    if (cards.length >= 2) return cards[cards.length - 2].move;
+    return cards[cards.length - 1].move;
   }
   if (side === 'dia') {
     // normal
@@ -199,8 +229,8 @@ function chooseElan(state, side, difficulty, rng) {
 
 /**
  * Choisit un coup pour `side` ('dia' ou 'player').
- * L’enchère de l’IA ignore volontairement la carte déjà posée par l’adversaire
- * (l’enchère est conçue comme simultanée).
+ * En phase d’enchère, la décision passe par simultaneousBidView : l’IA n’a
+ * jamais accès à la mise adverse (enchère simultanée).
  */
 export function chooseMove(state, side, rng) {
   const r = rngOf(state, rng);

@@ -15,8 +15,8 @@ export function playGame(opts = {}) {
   const maxSteps = opts.maxSteps || 400;
   while (!isOver(state) && steps < maxSteps) {
     const side = state.currentActor;
-    // En phase d’enchère, le joueur pose d’abord, puis l’IA — mais chaque camp
-    // choisit sans se caler sur la carte adverse (chooseMove l’ignore).
+    // En phase d’enchère, le joueur pose d’abord visuellement, puis l’IA :
+    // chooseMove passe par simultaneousBidView, sans accès à la mise adverse.
     const actor = state.phase === 'bid' && !state.bid.player ? 'player' : side;
     const move = chooseMove(state, actor, rng);
     if (!move) break;

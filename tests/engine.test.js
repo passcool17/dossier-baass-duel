@@ -255,9 +255,23 @@ test('debugForceEnd rend les deux fins accessibles', () => {
   const w = debugForceEnd(s, 'player', 'liens');
   assert.equal(w.winner, 'player');
   assert.ok(isOver(w));
+  assert.equal(w.liens.length, 3);
+  assert.equal(w.secrecy >= 0, true);
   const l = debugForceEnd(s, 'dia', 'secrecy');
   assert.equal(l.winner, 'dia');
   assert.ok(isOver(l));
+  assert.equal(l.secrecy, 6);
+});
+
+test('debugForceEnd affiche des compteurs plausibles (3 liens / secret 6)', () => {
+  const s = createGame({ difficulty: 'normal', seed: 1 });
+  const w = debugForceEnd(s, 'player', 'liens');
+  assert.equal(w.liens.length, 3);
+  assert.ok(w.liens.every((x) => w.tracks[x.track].locked === 'player'));
+  const l = debugForceEnd(s, 'dia', 'secrecy');
+  assert.equal(l.secrecy, 6);
+  const r = debugForceEnd(s, 'dia', 'redact');
+  assert.equal(Object.values(r.tracks).filter((tr) => tr.locked === 'dia').length, 3);
 });
 
 test('une partie complète (IA vs heuristique) se termine des deux côtés selon la graine', () => {
